@@ -9,7 +9,6 @@ import { ResultModal } from "@/src/components/ResultModal";
 import { getFeedback } from "@/src/lib/feedback";
 import { createRound, type RoundSeed } from "@/src/lib/round";
 import { validateGuess } from "@/src/lib/validateGuess";
-import { getValidWordsSet } from "@/src/lib/words";
 import type {
   GameMode,
   GuessResult,
@@ -37,11 +36,11 @@ const PRIORITY: KeyboardPriority = {
 
 export function GameExperience({ mode, modeLabel, initialRound }: GameExperienceProps) {
   const router = useRouter();
-  const validWords = useMemo(() => getValidWordsSet(), []);
   const [round, setRound] = useState<RoundSeed>(() => initialRound);
   const [attempts, setAttempts] = useState<GuessResult[]>([]);
   const [currentGuess, setCurrentGuess] = useState("");
   const [status, setStatus] = useState<RoundStatus>("playing");
+  const [isValidating, setIsValidating] = useState(false);
   const [message, setMessage] = useState("Organize as letras e descubra a palavra.");
 
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
@@ -72,16 +71,21 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     setAttempts([]);
     setCurrentGuess("");
     setStatus("playing");
+    setIsValidating(false);
     setMessage("Nova rodada iniciada. Boa sorte!");
   }, [mode]);
 
-  const submitGuess = useCallback(() => {
-    if (status !== "playing") {
+  const submitGuess = useCallback(async () => {
+    if (status !== "playing" || isValidating) {
       return;
     }
 
     const normalizedGuess = currentGuess.toLowerCase();
-    const validation = validateGuess(normalizedGuess, validWords, round.word);
+    setIsValidating(true);
+    setMessage("Validando no dicionario...");
+
+    const validation = await validateGuess(normalizedGuess, round.word);
+    setIsValidating(false);
 
     if (!validation.valid) {
       setMessage(validation.reason || "Chute invalido.");
@@ -116,7 +120,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     }
 
     setMessage("Boa tentativa. Continue ajustando a ordem.");
-  }, [attempts, currentGuess, mode, round.word, startNewRound, status, validWords]);
+  }, [attempts, currentGuess, isValidating, mode, round.word, startNewRound, status]);
 
   const onKey = useCallback(
     (rawKey: string) => {
@@ -125,7 +129,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         return;
       }
 
-      if (status !== "playing") {
+      if (status !== "playing" || isValidating) {
         return;
       }
 
@@ -145,7 +149,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         setCurrentGuess((prev) => `${prev}${key.toLowerCase()}`);
       }
     },
-    [currentGuess.length, startNewRound, status, submitGuess],
+    [currentGuess.length, isValidating, startNewRound, status, submitGuess],
   );
 
   useEffect(() => {
@@ -196,7 +200,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
           {message}
         </p>
 
-        <Keyboard onKey={onKey} disabled={status !== "playing"} keyStates={keyStates} />
+        <Keyboard onKey={onKey} disabled={status !== "playing" || isValidating} keyStates={keyStates} />
       </main>
 
       <ResultModal
