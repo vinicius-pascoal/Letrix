@@ -22,12 +22,12 @@ export function ResultModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-amber-950/55 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-amber-900/30 bg-amber-50 p-6 text-amber-950 shadow-xl sm:p-7">
-        <h2 className="text-2xl font-black">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-amber-950/65 px-3 py-4 sm:px-4">
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-sm overflow-y-auto rounded-2xl border border-amber-900/30 bg-amber-50 p-5 text-amber-950 shadow-xl sm:max-w-md sm:p-6">
+        <h2 className="text-xl font-black sm:text-2xl">
           {won ? "Acertou!" : "Fim de jogo"}
         </h2>
-        <p className="mt-2 text-sm sm:text-base">
+        <p className="mt-2 text-sm leading-relaxed sm:text-base">
           {won
             ? `Voce descobriu a palavra em ${attemptsUsed} tentativa(s).`
             : "Voce usou todas as tentativas disponiveis."}
@@ -36,7 +36,7 @@ export function ResultModal({
           Palavra correta: <span className="uppercase">{secret}</span>
         </p>
 
-        <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:mt-5 sm:grid-cols-2">
           <button
             type="button"
             onClick={onPlayAgain}

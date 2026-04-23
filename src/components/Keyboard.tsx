@@ -44,14 +44,14 @@ export function Keyboard({ onKey, disabled, keyStates }: KeyboardProps) {
   return (
     <section className="w-full space-y-2">
       {ROWS.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-1.5 sm:gap-2">
+        <div key={rowIndex} className="flex justify-center gap-1 sm:gap-1.5 lg:gap-2">
           {row.map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => onKey(key)}
               disabled={disabled}
-              className={`rounded-lg px-2 py-3 text-[11px] font-bold tracking-wide transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55 sm:px-3 sm:text-sm ${key === "ENTER" || key === "BACK" ? "min-w-16" : "min-w-8"
+              className={`rounded-lg px-1.5 py-2.5 text-[10px] font-bold tracking-wide transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55 sm:px-2.5 sm:py-3 sm:text-xs lg:text-sm ${key === "ENTER" || key === "BACK" ? "min-w-14 sm:min-w-16 lg:min-w-18" : "min-w-7 sm:min-w-8 lg:min-w-10"
                 } ${stateClass(keyStates[key])}`}
             >
               {label(key)}

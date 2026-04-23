@@ -50,13 +50,13 @@ export function GameBoard({
   });
 
   return (
-    <section className="w-full">
-      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+    <section className="mx-auto w-[min(92vw,18rem)] sm:w-[min(86vw,21rem)] md:w-[min(78vw,24rem)]">
+      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 md:gap-2.5">
         {rows.flatMap((row, rowIndex) =>
           row.map((cell, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
-              className={`flex aspect-square items-center justify-center rounded-xl border text-xl font-black uppercase transition-all sm:text-2xl ${cellClass(cell.state)}`}
+              className={`flex aspect-square items-center justify-center rounded-lg border text-lg font-black uppercase transition-all sm:text-xl md:text-2xl ${cellClass(cell.state)}`}
             >
               {cell.letter}
             </div>

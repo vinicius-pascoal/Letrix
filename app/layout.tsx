@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${sans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-screen flex flex-col overflow-x-hidden">{children}</body>
     </html>
   );
 }

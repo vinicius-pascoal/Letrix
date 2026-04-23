@@ -23,7 +23,7 @@ interface GameExperienceProps {
   initialRound: RoundSeed;
 }
 
-const MAX_ATTEMPTS = 6;
+const MAX_ATTEMPTS = 2;
 const WORD_LENGTH = 5;
 
 type KeyboardPriority = Record<LetterState, number>;
@@ -161,14 +161,14 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
 
   return (
     <>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 pb-8 pt-5 sm:px-6 sm:pt-8">
-        <section className="grid gap-4 rounded-2xl border border-amber-900/20 bg-white/85 p-4 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-5">
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-3 pb-6 pt-4 sm:px-5 sm:pt-6 lg:gap-5 lg:pb-8">
+        <section className="grid gap-3 rounded-2xl border border-amber-900/20 bg-white/85 p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-4 lg:p-5">
           <AnagramHint anagram={round.anagram.toUpperCase()} />
-          <div className="space-y-2 rounded-xl bg-amber-50 p-3 sm:min-w-52">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-900/75">
+          <div className="space-y-2 rounded-xl bg-amber-50 p-3 sm:min-w-48 lg:min-w-52">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-900/75 sm:text-xs">
               Tentativas
             </p>
-            <p className="text-xl font-black text-amber-950">
+            <p className="text-lg font-black text-amber-950 sm:text-xl">
               {attemptsLeft} / {MAX_ATTEMPTS}
             </p>
             <p className="text-xs text-amber-900/85 sm:text-sm">{modeLabel}</p>
@@ -182,7 +182,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
           status={status}
         />
 
-        <p className="rounded-xl border border-amber-900/15 bg-amber-50 px-3 py-2 text-sm text-amber-900 sm:text-base">
+        <p className="rounded-xl border border-amber-900/15 bg-amber-50 px-3 py-2 text-xs text-amber-900 sm:text-sm lg:text-base">
           {message}
         </p>
 
