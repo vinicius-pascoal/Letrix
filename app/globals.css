@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fef7e8;
-  --foreground: #2b1b0f;
+  --background: #0b1020;
+  --foreground: #edf2ff;
 }
 
 @theme inline {
@@ -14,9 +14,10 @@
 
 body {
   background:
-    radial-gradient(circle at 5% 10%, #f59e0b36 0%, transparent 35%),
-    radial-gradient(circle at 90% 20%, #f9731636 0%, transparent 40%),
-    linear-gradient(180deg, #fff7ea 0%, #fef3c7 50%, #fff8ef 100%);
+    radial-gradient(circle at 10% 15%, #6366f122 0%, transparent 32%),
+    radial-gradient(circle at 88% 12%, #0ea5e922 0%, transparent 28%),
+    radial-gradient(circle at 50% 100%, #14b8a622 0%, transparent 34%),
+    linear-gradient(180deg, #090f1d 0%, #0e172a 55%, #111827 100%);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
 }
@@ -29,5 +30,5 @@ h3 {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #92400e #ffedd5;
+  scrollbar-color: #475569 #0f172a;
 }

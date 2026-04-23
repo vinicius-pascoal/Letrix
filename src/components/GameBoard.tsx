@@ -9,18 +9,18 @@ interface GameBoardProps {
 
 function cellClass(state?: string) {
   if (state === "correct") {
-    return "border-emerald-700 bg-emerald-600 text-white";
+    return "border-emerald-500/60 bg-emerald-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
   }
 
   if (state === "present") {
-    return "border-yellow-700 bg-yellow-500 text-amber-950";
+    return "border-amber-400/60 bg-amber-500 text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]";
   }
 
   if (state === "absent") {
-    return "border-stone-400 bg-stone-300 text-stone-700";
+    return "border-slate-600/80 bg-slate-700 text-slate-200";
   }
 
-  return "border-amber-900/25 bg-white text-amber-950";
+  return "border-slate-600/80 bg-slate-900 text-slate-100";
 }
 
 export function GameBoard({

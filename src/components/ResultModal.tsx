@@ -22,8 +22,8 @@ export function ResultModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-amber-950/65 px-3 py-4 sm:px-4">
-      <div className="max-h-[calc(100vh-2rem)] w-full max-w-sm overflow-y-auto rounded-2xl border border-amber-900/30 bg-amber-50 p-5 text-amber-950 shadow-xl sm:max-w-md sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-3 py-4 sm:px-4">
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-sm overflow-y-auto rounded-2xl border border-slate-700/70 bg-slate-900 p-5 text-slate-50 shadow-xl sm:max-w-md sm:p-6">
         <h2 className="text-xl font-black sm:text-2xl">
           {won ? "Acertou!" : "Fim de jogo"}
         </h2>
@@ -32,7 +32,7 @@ export function ResultModal({
             ? `Voce descobriu a palavra em ${attemptsUsed} tentativa(s).`
             : "Voce usou todas as tentativas disponiveis."}
         </p>
-        <p className="mt-3 rounded-xl bg-amber-100 px-3 py-2 text-sm font-semibold sm:text-base">
+        <p className="mt-3 rounded-xl bg-slate-800 px-3 py-2 text-sm font-semibold sm:text-base text-slate-100">
           Palavra correta: <span className="uppercase">{secret}</span>
         </p>
 
@@ -40,14 +40,14 @@ export function ResultModal({
           <button
             type="button"
             onClick={onPlayAgain}
-            className="rounded-xl bg-amber-900 px-4 py-3 text-sm font-bold text-amber-50 transition hover:bg-amber-800"
+            className="rounded-xl bg-sky-500 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-sky-400"
           >
             {infiniteMode ? "Proxima rodada" : "Jogar novamente"}
           </button>
           <button
             type="button"
             onClick={onBackHome}
-            className="rounded-xl border border-amber-900/25 bg-white px-4 py-3 text-sm font-bold text-amber-950 transition hover:bg-amber-100"
+            className="rounded-xl border border-slate-600/70 bg-slate-950 px-4 py-3 text-sm font-bold text-slate-100 transition hover:bg-slate-800"
           >
             Voltar ao inicio
           </button>

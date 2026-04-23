@@ -18,14 +18,14 @@ function stateClass(state?: KeyStatus): string {
   }
 
   if (state === "present") {
-    return "bg-yellow-400 text-amber-950";
+    return "bg-amber-500 text-slate-950";
   }
 
   if (state === "absent") {
-    return "bg-stone-300 text-stone-700";
+    return "bg-slate-700 text-slate-200";
   }
 
-  return "bg-amber-100 text-amber-950";
+  return "bg-slate-800 text-slate-100";
 }
 
 function label(key: string): string {
@@ -51,7 +51,7 @@ export function Keyboard({ onKey, disabled, keyStates }: KeyboardProps) {
               type="button"
               onClick={() => onKey(key)}
               disabled={disabled}
-              className={`rounded-lg px-1.5 py-2.5 text-[10px] font-bold tracking-wide transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55 sm:px-2.5 sm:py-3 sm:text-xs lg:text-sm ${key === "ENTER" || key === "BACK" ? "min-w-14 sm:min-w-16 lg:min-w-18" : "min-w-7 sm:min-w-8 lg:min-w-10"
+              className={`rounded-lg border border-slate-600/70 px-1.5 py-2.5 text-[10px] font-bold tracking-wide transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55 sm:px-2.5 sm:py-3 sm:text-xs lg:text-sm ${key === "ENTER" || key === "BACK" ? "min-w-14 sm:min-w-16 lg:min-w-18" : "min-w-7 sm:min-w-8 lg:min-w-10"
                 } ${stateClass(keyStates[key])}`}
             >
               {label(key)}
