@@ -6,10 +6,10 @@ import { AnagramHint } from "@/src/components/AnagramHint";
 import { GameBoard } from "@/src/components/GameBoard";
 import { Keyboard } from "@/src/components/Keyboard";
 import { ResultModal } from "@/src/components/ResultModal";
-import { generateAnagram } from "@/src/lib/anagram";
 import { getFeedback } from "@/src/lib/feedback";
+import { createRound, type RoundSeed } from "@/src/lib/round";
 import { validateGuess } from "@/src/lib/validateGuess";
-import { getSecretWord, getValidWordsSet } from "@/src/lib/words";
+import { getValidWordsSet } from "@/src/lib/words";
 import type {
   GameMode,
   GuessResult,
@@ -20,6 +20,7 @@ import type {
 interface GameExperienceProps {
   mode: GameMode;
   modeLabel: string;
+  initialRound: RoundSeed;
 }
 
 const MAX_ATTEMPTS = 6;
@@ -34,21 +35,10 @@ const PRIORITY: KeyboardPriority = {
   correct: 3,
 };
 
-interface RoundSeed {
-  word: string;
-  anagram: string;
-}
-
-function createRound(mode: GameMode): RoundSeed {
-  const word = getSecretWord(mode);
-  const anagram = generateAnagram(word);
-  return { word, anagram };
-}
-
-export function GameExperience({ mode, modeLabel }: GameExperienceProps) {
+export function GameExperience({ mode, modeLabel, initialRound }: GameExperienceProps) {
   const router = useRouter();
   const validWords = useMemo(() => getValidWordsSet(), []);
-  const [round, setRound] = useState<RoundSeed>(() => createRound(mode));
+  const [round, setRound] = useState<RoundSeed>(() => initialRound);
   const [attempts, setAttempts] = useState<GuessResult[]>([]);
   const [currentGuess, setCurrentGuess] = useState("");
   const [status, setStatus] = useState<RoundStatus>("playing");
