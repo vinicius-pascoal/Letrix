@@ -8,9 +8,6 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-3 pb-8 pt-4 sm:gap-6 sm:px-5 sm:pt-8">
         <section className="grid gap-4 rounded-3xl border border-slate-700/60 bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:grid-cols-[1.2fr_1fr] sm:p-7 lg:p-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300/70">
-              MVP jogavel
-            </p>
             <h1 className="mt-2 font-display text-3xl font-black uppercase leading-[0.92] tracking-[0.04em] text-slate-50 sm:text-5xl lg:text-6xl">
               Organize as letras.
             </h1>
