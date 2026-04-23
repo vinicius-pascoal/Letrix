@@ -101,6 +101,11 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     if (normalizedGuess === round.word) {
       setStatus("won");
       setMessage("Excelente! Voce acertou a palavra.");
+
+      if (mode === "infinite") {
+        startNewRound();
+      }
+
       return;
     }
 
@@ -111,10 +116,15 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     }
 
     setMessage("Boa tentativa. Continue ajustando a ordem.");
-  }, [attempts, currentGuess, round.word, status, validWords]);
+  }, [attempts, currentGuess, mode, round.word, startNewRound, status, validWords]);
 
   const onKey = useCallback(
     (rawKey: string) => {
+      if (status === "won" && rawKey.toUpperCase() === "ENTER") {
+        startNewRound();
+        return;
+      }
+
       if (status !== "playing") {
         return;
       }
@@ -135,7 +145,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         setCurrentGuess((prev) => `${prev}${key.toLowerCase()}`);
       }
     },
-    [currentGuess.length, status, submitGuess],
+    [currentGuess.length, startNewRound, status, submitGuess],
   );
 
   useEffect(() => {
