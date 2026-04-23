@@ -1,4 +1,5 @@
 import type { GuessValidation } from "@/src/types/game";
+import { getAnswerWords, getValidWordsSet } from "@/src/lib/words";
 
 interface DictionaryLookupResponse {
   exists: boolean;
@@ -8,6 +9,11 @@ interface DictionaryLookupResponse {
 function normalizeLetters(value: string): string {
   return value.toLowerCase().split("").sort().join("");
 }
+
+const localDictionary = new Set<string>([
+  ...getAnswerWords().map((word) => word.toLowerCase()),
+  ...getValidWordsSet(),
+]);
 
 export function validateGuess(
   guess: string,
@@ -29,6 +35,10 @@ export function validateGuess(
       valid: false,
       reason: "O chute precisa usar exatamente as letras do anagrama.",
     });
+  }
+
+  if (localDictionary.has(normalizedGuess)) {
+    return Promise.resolve({ valid: true });
   }
 
   return fetch(`/api/dictionary/word/${encodeURIComponent(normalizedGuess)}`)
