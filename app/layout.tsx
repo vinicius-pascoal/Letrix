@@ -15,6 +15,9 @@ const sans = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Letrix",
   description: "Jogo de anagramas inspirado em Termo.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
