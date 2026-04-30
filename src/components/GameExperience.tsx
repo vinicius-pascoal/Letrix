@@ -320,54 +320,58 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
 
   return (
     <>
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-3 pb-6 pt-4 sm:px-5 sm:pt-6 lg:gap-5 lg:pb-8">
-        <section className="grid gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/90 p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-4 lg:p-5">
-          <AnagramHint anagram={round.anagram.toUpperCase()} />
-          <div className="space-y-2 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 sm:min-w-48 lg:min-w-52">
-            {isTimedMode ? (
-              <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
-                  Tempo restante
-                </p>
-                <p className="text-lg font-black text-slate-50 sm:text-xl">
-                  {formatTimeLeft(timeLeft)}
-                </p>
-                <p className="text-xs text-slate-300/85 sm:text-sm">{score} ponto(s)</p>
-              </>
-            ) : (
-              <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
-                  Tentativas
-                </p>
-                <p className="text-lg font-black text-slate-50 sm:text-xl">
-                  {attemptsLeft} / {MAX_ATTEMPTS}
-                </p>
-              </>
-            )}
-            <p className="text-xs text-slate-300/85 sm:text-sm">{modeLabel}</p>
+      <main className="mx-auto w-full max-w-4xl px-3 sm:px-5">
+        <div className="rounded-3xl bg-slate-900/80 border border-slate-700/60 shadow-lg p-4 lg:p-6">
+          <div className="flex flex-1 flex-col gap-4 pb-6 pt-4 lg:gap-5 lg:pb-8">
+            <section className="grid gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/90 p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-4 lg:p-5">
+              <AnagramHint anagram={round.anagram.toUpperCase()} />
+              <div className="space-y-2 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 sm:min-w-48 lg:min-w-52">
+                {isTimedMode ? (
+                  <>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
+                      Tempo restante
+                    </p>
+                    <p className="text-lg font-black text-slate-50 sm:text-xl">
+                      {formatTimeLeft(timeLeft)}
+                    </p>
+                    <p className="text-xs text-slate-300/85 sm:text-sm">{score} ponto(s)</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
+                      Tentativas
+                    </p>
+                    <p className="text-lg font-black text-slate-50 sm:text-xl">
+                      {attemptsLeft} / {MAX_ATTEMPTS}
+                    </p>
+                  </>
+                )}
+                <p className="text-xs text-slate-300/85 sm:text-sm">{modeLabel}</p>
+              </div>
+            </section>
+
+            <div key={boardErrorVersion} className={boardErrorVersion > 0 ? "shake-once" : undefined}>
+              <GameBoard
+                attempts={attempts}
+                maxAttempts={MAX_ATTEMPTS}
+                currentGuess={currentGuess}
+                status={status}
+                revealedRowIndex={revealedRowIndex}
+              />
+            </div>
+
+            <p className="rounded-xl border border-slate-700/70 bg-slate-900 px-3 py-2 text-xs text-slate-200 sm:text-sm lg:text-base">
+              {message}
+            </p>
+
+            <Keyboard
+              onKey={onKey}
+              disabled={status !== "playing" || isValidating || isAdvancingRound}
+              keyStates={keyStates}
+              highlightedKeys={highlightedKeys}
+            />
           </div>
-        </section>
-
-        <div key={boardErrorVersion} className={boardErrorVersion > 0 ? "shake-once" : undefined}>
-          <GameBoard
-            attempts={attempts}
-            maxAttempts={MAX_ATTEMPTS}
-            currentGuess={currentGuess}
-            status={status}
-            revealedRowIndex={revealedRowIndex}
-          />
         </div>
-
-        <p className="rounded-xl border border-slate-700/70 bg-slate-900 px-3 py-2 text-xs text-slate-200 sm:text-sm lg:text-base">
-          {message}
-        </p>
-
-        <Keyboard
-          onKey={onKey}
-          disabled={status !== "playing" || isValidating || isAdvancingRound}
-          keyStates={keyStates}
-          highlightedKeys={highlightedKeys}
-        />
       </main>
 
       <ResultModal

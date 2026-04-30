@@ -13,11 +13,11 @@
 }
 
 body {
-  background:
-    radial-gradient(circle at 10% 15%, #6366f122 0%, transparent 32%),
-    radial-gradient(circle at 88% 12%, #0ea5e922 0%, transparent 28%),
-    radial-gradient(circle at 50% 100%, #14b8a622 0%, transparent 34%),
-    linear-gradient(180deg, #090f1d 0%, #0e172a 55%, #111827 100%);
+  background-color: #0b1020;
+  background-image: url("/fundo.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
 }
