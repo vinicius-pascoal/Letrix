@@ -26,6 +26,7 @@ const MAX_ATTEMPTS = 2;
 const WORD_LENGTH = 5;
 const TIMED_ROUND_SECONDS = 180;
 const ANAGRAM_MISMATCH_REASON = "O chute precisa usar exatamente as letras do anagrama.";
+const WORD_NOT_FOUND_REASON = "Palavra nao encontrada no dicionario.";
 
 type KeyboardPriority = Record<LetterState, number>;
 type KeyboardStateMap = Record<string, "correct" | "present" | "absent">;
@@ -195,8 +196,12 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     if (!validation.valid) {
       setMessage(validation.reason || "Chute invalido.");
 
-      if (validation.reason === ANAGRAM_MISMATCH_REASON) {
+      if (validation.reason === ANAGRAM_MISMATCH_REASON || validation.reason === WORD_NOT_FOUND_REASON) {
         setBoardErrorVersion((currentVersion) => currentVersion + 1);
+      }
+
+      if (validation.reason === WORD_NOT_FOUND_REASON) {
+        setCurrentGuess("");
       }
 
       return;
