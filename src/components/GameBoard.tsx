@@ -5,6 +5,7 @@ interface GameBoardProps {
   maxAttempts: number;
   currentGuess: string;
   status: RoundStatus;
+  revealedRowIndex: number | null;
 }
 
 function cellClass(state?: string) {
@@ -28,6 +29,7 @@ export function GameBoard({
   maxAttempts,
   currentGuess,
   status,
+  revealedRowIndex,
 }: GameBoardProps) {
   const rows = Array.from({ length: maxAttempts }, (_, rowIndex) => {
     const attempt = attempts[rowIndex];
@@ -56,7 +58,9 @@ export function GameBoard({
           row.map((cell, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
-              className={`flex aspect-square items-center justify-center rounded-lg border text-lg font-black uppercase transition-all sm:text-xl md:text-2xl ${cellClass(cell.state)}`}
+              className={`flex aspect-square items-center justify-center rounded-lg border text-lg font-black uppercase transition-all sm:text-xl md:text-2xl ${cellClass(cell.state)} ${rowIndex === revealedRowIndex && cell.state !== "empty" ? "flip-card" : ""
+                }`}
+              style={rowIndex === revealedRowIndex && cell.state !== "empty" ? { animationDelay: `${colIndex * 70}ms` } : undefined}
             >
               {cell.letter}
             </div>

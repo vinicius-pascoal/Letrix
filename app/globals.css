@@ -60,3 +60,50 @@ h3 {
 .shake-once {
   animation: shake-once 360ms ease-in-out;
 }
+
+@keyframes flip-card {
+  0% {
+    transform: perspective(700px) rotateX(0deg);
+  }
+
+  45% {
+    transform: perspective(700px) rotateX(90deg);
+    filter: brightness(1.1);
+  }
+
+  55% {
+    transform: perspective(700px) rotateX(90deg);
+    filter: brightness(1.15);
+  }
+
+  100% {
+    transform: perspective(700px) rotateX(0deg);
+  }
+}
+
+.flip-card {
+  transform-origin: center;
+  backface-visibility: hidden;
+  animation: flip-card 520ms ease-in-out;
+}
+
+@keyframes key-highlight {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+
+  50% {
+    transform: translateY(-1px) scale(1.04);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+}
+
+.key-highlight {
+  animation: key-highlight 420ms ease-out;
+}

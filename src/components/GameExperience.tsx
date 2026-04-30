@@ -27,6 +27,7 @@ const WORD_LENGTH = 5;
 const ANAGRAM_MISMATCH_REASON = "O chute precisa usar exatamente as letras do anagrama.";
 
 type KeyboardPriority = Record<LetterState, number>;
+type KeyboardStateMap = Record<string, "correct" | "present" | "absent">;
 
 const PRIORITY: KeyboardPriority = {
   empty: 0,
@@ -34,6 +35,27 @@ const PRIORITY: KeyboardPriority = {
   present: 2,
   correct: 3,
 };
+
+function buildKeyStates(attempts: GuessResult[]): KeyboardStateMap {
+  const map: KeyboardStateMap = {};
+
+  for (const attempt of attempts) {
+    for (const { letter, state } of attempt.feedback) {
+      if (state === "empty") {
+        continue;
+      }
+
+      const key = letter.toUpperCase();
+      const previous = map[key] || "absent";
+
+      if (!map[key] || PRIORITY[state] > PRIORITY[previous]) {
+        map[key] = state === "correct" ? "correct" : state === "present" ? "present" : "absent";
+      }
+    }
+  }
+
+  return map;
+}
 
 export function GameExperience({ mode, modeLabel, initialRound }: GameExperienceProps) {
   const router = useRouter();
@@ -43,29 +65,14 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
   const [status, setStatus] = useState<RoundStatus>("playing");
   const [isValidating, setIsValidating] = useState(false);
   const [boardErrorVersion, setBoardErrorVersion] = useState(0);
+  const [revealedRowIndex, setRevealedRowIndex] = useState<number | null>(null);
+  const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
   const [message, setMessage] = useState("Organize as letras e descubra a palavra.");
 
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
 
   const keyStates = useMemo(() => {
-    const map: Record<string, "correct" | "present" | "absent"> = {};
-
-    for (const attempt of attempts) {
-      for (const { letter, state } of attempt.feedback) {
-        if (state === "empty") {
-          continue;
-        }
-
-        const key = letter.toUpperCase();
-        const prev = map[key] || "absent";
-
-        if (!map[key] || PRIORITY[state] > PRIORITY[prev]) {
-          map[key] = state === "correct" ? "correct" : state === "present" ? "present" : "absent";
-        }
-      }
-    }
-
-    return map;
+    return buildKeyStates(attempts);
   }, [attempts]);
 
   const startNewRound = useCallback(() => {
@@ -75,6 +82,8 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     setStatus("playing");
     setIsValidating(false);
     setBoardErrorVersion(0);
+    setRevealedRowIndex(null);
+    setHighlightedKeys([]);
     setMessage("Nova rodada iniciada. Boa sorte!");
   }, [mode]);
 
@@ -107,7 +116,26 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     };
 
     const nextAttempts = [...attempts, newAttempt];
+    const nextKeyStates = buildKeyStates(nextAttempts);
+    const newlyDiscoveredKeys = Object.keys(nextKeyStates).filter((key) => {
+      const previousState = keyStates[key];
+      const nextState = nextKeyStates[key];
+
+      if (!previousState) {
+        return nextState === "correct" || nextState === "present";
+      }
+
+      if (previousState === nextState) {
+        return false;
+      }
+
+      return PRIORITY[nextState === "correct" ? "correct" : nextState === "present" ? "present" : "absent"] >
+        PRIORITY[previousState === "correct" ? "correct" : previousState === "present" ? "present" : "absent"];
+    });
+
     setAttempts(nextAttempts);
+    setRevealedRowIndex(nextAttempts.length - 1);
+    setHighlightedKeys(newlyDiscoveredKeys);
     setCurrentGuess("");
 
     if (normalizedGuess === round.word) {
@@ -128,7 +156,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     }
 
     setMessage("Boa tentativa. Continue ajustando a ordem.");
-  }, [attempts, currentGuess, isValidating, mode, round.word, startNewRound, status]);
+  }, [attempts, currentGuess, isValidating, keyStates, mode, round.word, startNewRound, status]);
 
   const onKey = useCallback(
     (rawKey: string) => {
@@ -203,6 +231,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
             maxAttempts={MAX_ATTEMPTS}
             currentGuess={currentGuess}
             status={status}
+            revealedRowIndex={revealedRowIndex}
           />
         </div>
 
@@ -210,7 +239,12 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
           {message}
         </p>
 
-        <Keyboard onKey={onKey} disabled={status !== "playing" || isValidating} keyStates={keyStates} />
+        <Keyboard
+          onKey={onKey}
+          disabled={status !== "playing" || isValidating}
+          keyStates={keyStates}
+          highlightedKeys={highlightedKeys}
+        />
       </main>
 
       <ResultModal

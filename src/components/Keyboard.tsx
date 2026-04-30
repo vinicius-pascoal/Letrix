@@ -4,6 +4,7 @@ interface KeyboardProps {
   onKey: (key: string) => void;
   disabled: boolean;
   keyStates: Record<string, KeyStatus>;
+  highlightedKeys: string[];
 }
 
 const ROWS = [
@@ -40,7 +41,7 @@ function label(key: string): string {
   return key;
 }
 
-export function Keyboard({ onKey, disabled, keyStates }: KeyboardProps) {
+export function Keyboard({ onKey, disabled, keyStates, highlightedKeys }: KeyboardProps) {
   return (
     <section className="w-full space-y-2">
       {ROWS.map((row, rowIndex) => (
@@ -52,7 +53,7 @@ export function Keyboard({ onKey, disabled, keyStates }: KeyboardProps) {
               onClick={() => onKey(key)}
               disabled={disabled}
               className={`rounded-lg border border-slate-600/70 px-1.5 py-2.5 text-[10px] font-bold tracking-wide transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55 sm:px-2.5 sm:py-3 sm:text-xs lg:text-sm ${key === "ENTER" || key === "BACK" ? "min-w-14 sm:min-w-16 lg:min-w-18" : "min-w-7 sm:min-w-8 lg:min-w-10"
-                } ${stateClass(keyStates[key])}`}
+                } ${stateClass(keyStates[key])} ${highlightedKeys.includes(key) ? "key-highlight" : ""}`}
             >
               {label(key)}
             </button>
