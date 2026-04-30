@@ -24,6 +24,7 @@ interface GameExperienceProps {
 
 const MAX_ATTEMPTS = 2;
 const WORD_LENGTH = 5;
+const ANAGRAM_MISMATCH_REASON = "O chute precisa usar exatamente as letras do anagrama.";
 
 type KeyboardPriority = Record<LetterState, number>;
 
@@ -41,6 +42,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
   const [currentGuess, setCurrentGuess] = useState("");
   const [status, setStatus] = useState<RoundStatus>("playing");
   const [isValidating, setIsValidating] = useState(false);
+  const [boardErrorVersion, setBoardErrorVersion] = useState(0);
   const [message, setMessage] = useState("Organize as letras e descubra a palavra.");
 
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
@@ -72,6 +74,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     setCurrentGuess("");
     setStatus("playing");
     setIsValidating(false);
+    setBoardErrorVersion(0);
     setMessage("Nova rodada iniciada. Boa sorte!");
   }, [mode]);
 
@@ -89,6 +92,11 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
 
     if (!validation.valid) {
       setMessage(validation.reason || "Chute invalido.");
+
+      if (validation.reason === ANAGRAM_MISMATCH_REASON) {
+        setBoardErrorVersion((currentVersion) => currentVersion + 1);
+      }
+
       return;
     }
 
@@ -189,12 +197,14 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
           </div>
         </section>
 
-        <GameBoard
-          attempts={attempts}
-          maxAttempts={MAX_ATTEMPTS}
-          currentGuess={currentGuess}
-          status={status}
-        />
+        <div key={boardErrorVersion} className={boardErrorVersion > 0 ? "shake-once" : undefined}>
+          <GameBoard
+            attempts={attempts}
+            maxAttempts={MAX_ATTEMPTS}
+            currentGuess={currentGuess}
+            status={status}
+          />
+        </div>
 
         <p className="rounded-xl border border-slate-700/70 bg-slate-900 px-3 py-2 text-xs text-slate-200 sm:text-sm lg:text-base">
           {message}
