@@ -35,8 +35,8 @@ export function ResultModal({
           {timedMode
             ? `Voce fez ${score} ponto(s) na partida de tempo.`
             : won
-            ? `Voce descobriu a palavra em ${attemptsUsed} tentativa(s).`
-            : "Voce usou todas as tentativas disponiveis."}
+              ? `Voce descobriu a palavra em ${attemptsUsed} tentativa(s).`
+              : "Voce usou todas as tentativas disponiveis."}
         </p>
         <p className="mt-3 rounded-xl bg-slate-800 px-3 py-2 text-sm font-semibold sm:text-base text-slate-100">
           Palavra correta: <span className="uppercase">{secret}</span>
