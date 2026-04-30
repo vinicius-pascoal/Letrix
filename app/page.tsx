@@ -36,6 +36,12 @@ export default function Home() {
             >
               Modo infinito
             </Link>
+            <Link
+              href="/timed"
+              className="rounded-2xl border border-slate-600/70 bg-slate-900 px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-slate-100 transition hover:bg-slate-800 sm:py-4 sm:text-sm"
+            >
+              Modo tempo
+            </Link>
           </div>
         </section>
 
@@ -48,6 +54,7 @@ export default function Home() {
             <li>Digite um chute valido usando exatamente as mesmas letras.</li>
             <li>Acerto de posicao: verde. Letra fora de ordem: amarelo.</li>
             <li>Voce tem 2 tentativas para vencer a rodada.</li>
+            <li>No modo tempo, voce tem 3 minutos para somar o maximo de pontos.</li>
           </ul>
         </section>
       </main>

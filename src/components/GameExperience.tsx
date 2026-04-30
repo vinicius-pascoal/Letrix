@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { AnagramHint } from "@/src/components/AnagramHint";
 import { GameBoard } from "@/src/components/GameBoard";
@@ -24,6 +24,7 @@ interface GameExperienceProps {
 
 const MAX_ATTEMPTS = 2;
 const WORD_LENGTH = 5;
+const TIMED_ROUND_SECONDS = 180;
 const ANAGRAM_MISMATCH_REASON = "O chute precisa usar exatamente as letras do anagrama.";
 
 type KeyboardPriority = Record<LetterState, number>;
@@ -35,6 +36,15 @@ const PRIORITY: KeyboardPriority = {
   present: 2,
   correct: 3,
 };
+
+function formatTimeLeft(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+
+  return `${minutes}:${seconds}`;
+}
 
 function buildKeyStates(attempts: GuessResult[]): KeyboardStateMap {
   const map: KeyboardStateMap = {};
@@ -59,6 +69,7 @@ function buildKeyStates(attempts: GuessResult[]): KeyboardStateMap {
 
 export function GameExperience({ mode, modeLabel, initialRound }: GameExperienceProps) {
   const router = useRouter();
+  const isTimedMode = mode === "timed";
   const [round, setRound] = useState<RoundSeed>(() => initialRound);
   const [attempts, setAttempts] = useState<GuessResult[]>([]);
   const [currentGuess, setCurrentGuess] = useState("");
@@ -67,15 +78,40 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
   const [boardErrorVersion, setBoardErrorVersion] = useState(0);
   const [revealedRowIndex, setRevealedRowIndex] = useState<number | null>(null);
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
-  const [message, setMessage] = useState("Organize as letras e descubra a palavra.");
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(isTimedMode ? TIMED_ROUND_SECONDS : 0);
+  const [isAdvancingRound, setIsAdvancingRound] = useState(false);
+  const [message, setMessage] = useState(
+    isTimedMode
+      ? "3 minutos no relógio. Cada acerto vale 1 ponto."
+      : "Organize as letras e descubra a palavra.",
+  );
+  const pendingRoundTimeoutRef = useRef<number | null>(null);
+  const timeLeftRef = useRef(timeLeft);
 
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
+
+  useEffect(() => {
+    timeLeftRef.current = timeLeft;
+  }, [timeLeft]);
 
   const keyStates = useMemo(() => {
     return buildKeyStates(attempts);
   }, [attempts]);
 
+  const clearPendingRoundTimeout = useCallback(() => {
+    if (pendingRoundTimeoutRef.current !== null) {
+      window.clearTimeout(pendingRoundTimeoutRef.current);
+      pendingRoundTimeoutRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => clearPendingRoundTimeout();
+  }, [clearPendingRoundTimeout]);
+
   const startNewRound = useCallback(() => {
+    clearPendingRoundTimeout();
     setRound(createRound(mode));
     setAttempts([]);
     setCurrentGuess("");
@@ -84,11 +120,64 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     setBoardErrorVersion(0);
     setRevealedRowIndex(null);
     setHighlightedKeys([]);
+    setIsAdvancingRound(false);
+    if (isTimedMode) {
+      setScore(0);
+      setTimeLeft(TIMED_ROUND_SECONDS);
+      setMessage("Nova partida iniciada. Corra contra o tempo!");
+      return;
+    }
+
     setMessage("Nova rodada iniciada. Boa sorte!");
-  }, [mode]);
+  }, [clearPendingRoundTimeout, isTimedMode, mode]);
+
+  const advanceTimedRound = useCallback(
+    (nextMessage: string) => {
+      clearPendingRoundTimeout();
+      setIsAdvancingRound(true);
+      pendingRoundTimeoutRef.current = window.setTimeout(() => {
+        setRound(createRound(mode));
+        setAttempts([]);
+        setCurrentGuess("");
+        setStatus("playing");
+        setIsValidating(false);
+        setBoardErrorVersion(0);
+        setRevealedRowIndex(null);
+        setHighlightedKeys([]);
+        setIsAdvancingRound(false);
+        setMessage(nextMessage);
+        pendingRoundTimeoutRef.current = null;
+      }, 650);
+    },
+    [clearPendingRoundTimeout, mode],
+  );
+
+  useEffect(() => {
+    if (!isTimedMode || status !== "playing" || isAdvancingRound) {
+      return;
+    }
+
+    const timerId = window.setInterval(() => {
+      setTimeLeft((currentTimeLeft) => {
+        if (currentTimeLeft <= 1) {
+          window.clearInterval(timerId);
+          clearPendingRoundTimeout();
+          setStatus("lost");
+          setIsValidating(false);
+          setIsAdvancingRound(false);
+          setMessage("Tempo esgotado. Sua pontuação final está no placar.");
+          return 0;
+        }
+
+        return currentTimeLeft - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [clearPendingRoundTimeout, isAdvancingRound, isTimedMode, status]);
 
   const submitGuess = useCallback(async () => {
-    if (status !== "playing" || isValidating) {
+    if (status !== "playing" || isValidating || isAdvancingRound) {
       return;
     }
 
@@ -98,6 +187,10 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
 
     const validation = await validateGuess(normalizedGuess, round.word);
     setIsValidating(false);
+
+    if (isTimedMode && timeLeftRef.current <= 0) {
+      return;
+    }
 
     if (!validation.valid) {
       setMessage(validation.reason || "Chute invalido.");
@@ -139,6 +232,12 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     setCurrentGuess("");
 
     if (normalizedGuess === round.word) {
+      if (isTimedMode) {
+        setScore((currentScore) => currentScore + 1);
+        advanceTimedRound("Acerto! +1 ponto. Proximo anagrama chegando.");
+        return;
+      }
+
       setStatus("won");
       setMessage("Excelente! Voce acertou a palavra.");
 
@@ -150,13 +249,18 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
     }
 
     if (nextAttempts.length >= MAX_ATTEMPTS) {
+      if (isTimedMode) {
+        advanceTimedRound("Sem tentativas. Novo anagrama a caminho.");
+        return;
+      }
+
       setStatus("lost");
       setMessage("Sem tentativas restantes.");
       return;
     }
 
     setMessage("Boa tentativa. Continue ajustando a ordem.");
-  }, [attempts, currentGuess, isValidating, keyStates, mode, round.word, startNewRound, status]);
+  }, [advanceTimedRound, attempts, currentGuess, isAdvancingRound, isTimedMode, isValidating, keyStates, mode, round.word, startNewRound, status]);
 
   const onKey = useCallback(
     (rawKey: string) => {
@@ -165,7 +269,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         return;
       }
 
-      if (status !== "playing" || isValidating) {
+      if (status !== "playing" || isValidating || isAdvancingRound) {
         return;
       }
 
@@ -185,7 +289,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         setCurrentGuess((prev) => `${prev}${key.toLowerCase()}`);
       }
     },
-    [currentGuess.length, isValidating, startNewRound, status, submitGuess],
+    [currentGuess.length, isAdvancingRound, isValidating, startNewRound, status, submitGuess],
   );
 
   useEffect(() => {
@@ -215,12 +319,26 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         <section className="grid gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/90 p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-4 lg:p-5">
           <AnagramHint anagram={round.anagram.toUpperCase()} />
           <div className="space-y-2 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 sm:min-w-48 lg:min-w-52">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
-              Tentativas
-            </p>
-            <p className="text-lg font-black text-slate-50 sm:text-xl">
-              {attemptsLeft} / {MAX_ATTEMPTS}
-            </p>
+            {isTimedMode ? (
+              <>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
+                  Tempo restante
+                </p>
+                <p className="text-lg font-black text-slate-50 sm:text-xl">
+                  {formatTimeLeft(timeLeft)}
+                </p>
+                <p className="text-xs text-slate-300/85 sm:text-sm">{score} ponto(s)</p>
+              </>
+            ) : (
+              <>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/75 sm:text-xs">
+                  Tentativas
+                </p>
+                <p className="text-lg font-black text-slate-50 sm:text-xl">
+                  {attemptsLeft} / {MAX_ATTEMPTS}
+                </p>
+              </>
+            )}
             <p className="text-xs text-slate-300/85 sm:text-sm">{modeLabel}</p>
           </div>
         </section>
@@ -241,7 +359,7 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
 
         <Keyboard
           onKey={onKey}
-          disabled={status !== "playing" || isValidating}
+          disabled={status !== "playing" || isValidating || isAdvancingRound}
           keyStates={keyStates}
           highlightedKeys={highlightedKeys}
         />
@@ -253,6 +371,8 @@ export function GameExperience({ mode, modeLabel, initialRound }: GameExperience
         secret={round.word.toUpperCase()}
         attemptsUsed={attempts.length}
         infiniteMode={mode === "infinite"}
+        timedMode={isTimedMode}
+        score={score}
         onPlayAgain={startNewRound}
         onBackHome={() => router.push("/")}
       />

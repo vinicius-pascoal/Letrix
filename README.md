@@ -16,7 +16,7 @@ No Letrix, voce recebe as letras embaralhadas e precisa descobrir a palavra corr
 
 ## Funcionalidades
 
-- Modos de jogo: diario, aleatorio e infinito.
+- Modos de jogo: diario, aleatorio, infinito e tempo.
 - Validacao de chute com regras do anagrama.
 - Feedback por letra (correta, presente e ausente).
 - Teclado virtual + suporte ao teclado fisico.

@@ -1,4 +1,4 @@
-export type GameMode = "daily" | "random" | "infinite";
+export type GameMode = "daily" | "random" | "infinite" | "timed";
 
 export type RoundStatus = "playing" | "won" | "lost";
 
